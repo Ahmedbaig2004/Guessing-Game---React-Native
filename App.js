@@ -1,20 +1,69 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import StartGameScreen from "./screens/startGameScreen";
+import { StyleSheet, View, ImageBackground, SafeAreaView } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { useState } from "react";
+import GameScreen from "./screens/GameScreen";
+import GameOverScreen from "./screens/GameOverScreen";
+import { useFonts } from "expo-font";
+
+
 
 export default function App() {
+
+  const [userinput,setUserInput] = useState()
+  const [gameisover,setisgameover]=useState(true)
+  const [guesses,setGuesses] = useState(0)
+
+  const [fontsloaded] = useFonts({
+    'open-sans':require("./assets/fonts/OpenSans-Bold.ttf"),
+
+  })
+  if(!fontsloaded){
+    return null
+  }
+  const restartGame = () =>{
+    setisgameover(true)
+    setUserInput(undefined)
+    setGuesses(0)
+  }
+  let screen = <StartGameScreen inputhandler={inputhandler}/>
+  if(userinput){
+    screen = <GameScreen userinput ={userinput} setisgameover={setisgameover} setGuesses={setGuesses} guesses={guesses}/>
+  }
+  if(gameisover && userinput){
+    screen=<GameOverScreen usernumber={userinput} guesses={guesses} restartGame={restartGame}/>
+
+  }
+  function inputhandler(number)
+  {
+    setUserInput(number)
+    setisgameover(false)
+  }
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <LinearGradient
+      colors={["#271395ff", "#236bfbff", "#1c078fff"]}
+      style={styles.mainview}
+    >
+      <ImageBackground
+        source={require("./assets/images/background.png")}
+        resizeMode="cover"
+        style={styles.mainview}
+        imageStyle={styles.backgroundImage}
+      >
+        <SafeAreaView style={styles.mainview}>
+
+        {screen}
+        </SafeAreaView>
+      </ImageBackground>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  mainview: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
+  backgroundImage:{
+    opacity:0.10
+  }
 });
